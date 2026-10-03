@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>For My Mama 💜</title>
+
+<!-- Optional cute fonts (falls back to system cursive/sans if offline) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============ 1. THEME VARIABLES ============ */
+:root {
+  --lilac: #C8A2C8;
+  --lilac-soft: #D8BFD8;
+  --white: #ffffff;
+  --ink: #5b3f63;                         /* soft plum text */
+  --shadow: 0 12px 40px rgba(160, 110, 170, .25);
+  --script: "Dancing Script", "Brush Script MT", cursive;
+  --body: "Quicksand", "Segoe UI", system-ui, sans-serif;
+}
+
+/* ============ 2. BASE ============ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--body);
+  color: var(--ink);
+  background: linear-gradient(160deg, #fff 0%, var(--lilac-soft) 55%, var(--lilac) 100%);
+  background-attachment: fixed;
+  overflow: hidden;
+}
+
+/* ============ 3. FLOATING HEARTS (background) ============ */
+#hearts { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.heart {
+  position: absolute; bottom: -40px;
+  opacity: 0; color: #fff;
+  animation: floatUp linear forwards;
+}
+@keyframes floatUp {
+  0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: .75; }
+  100% { transform: translateY(-110vh) translateX(var(--drift)) rotate(25deg); opacity: 0; }
+}
+
+/* ============ 4. PAGES + FADE TRANSITIONS ============ */
+.page {
+  position: fixed; inset: 0; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 24px 16px; text-align: center;
+  overflow-y: auto;
+  opacity: 0; visibility: hidden;
+  transition: opacity .6s ease, visibility .6s;
+}
+.page.active { opacity: 1; visibility: visible; }
+/* Keeps tall content scrollable while staying centered */
+.page > * { margin-top: auto; margin-bottom: auto; }
+.page > * + * { margin-top: 0; }
+
+/* ============ 5. TYPOGRAPHY ============ */
+h1, h2 { font-family: var(--script); color: var(--ink); line-height: 1.15; margin-bottom: 22px; }
+h1 { font-size: clamp(3rem, 12vw, 6rem); }
+h2 { font-size: clamp(2.1rem, 7vw, 3.4rem); }
+p { font-size: clamp(1rem, 2.6vw, 1.15rem); line-height: 1.85; }
+.card p + p { margin-top: 1.1em; }
+
+/* ============ 6. CARD ============ */
+.card {
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(8px);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  padding: clamp(22px, 5vw, 40px);
+  width: min(680px, 100%);
+  margin-bottom: 26px;
+  animation: gentleFloat 6s ease-in-out infinite;
+}
+.card.poem p { font-size: clamp(1.1rem, 3vw, 1.35rem); font-style: italic; }
+@keyframes gentleFloat { 50% { transform: translateY(-6px); } }
+
+/* ============ 7. BUTTONS ============ */
+.btn-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+button {
+  font-family: var(--body); font-weight: 600; font-size: 1.05rem;
+  color: var(--ink); background: #fff;
+  border: 2px solid var(--lilac); border-radius: 999px;
+  padding: 14px 28px; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(160, 110, 170, .25);
+  transition: transform .2s, box-shadow .2s, background .2s;
+}
+button:hover { transform: translateY(-3px) scale(1.03); background: var(--lilac-soft); box-shadow: 0 10px 24px rgba(160, 110, 170, .35); }
+button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+button.primary { background: linear-gradient(135deg, var(--lilac), var(--lilac-soft)); border-color: #fff; }
+
+/* ============ 8. MODAL (Page 1 "No!" popup) ============ */
+#modal {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(91, 63, 99, .35);
+  opacity: 0; visibility: hidden; transition: opacity .35s, visibility .35s;
+}
+#modal.show { opacity: 1; visibility: visible; }
+#modal .card { animation: none; text-align: center; max-width: 380px; transform: scale(.9); transition: transform .35s; }
+#modal.show .card { transform: scale(1); }
+#modal h2 { font-size: 2.2rem; margin-bottom: 10px; }
+
+/* ============ 9. SPARKLES (page-change effect) ============ */
+.sparkle {
+  position: fixed; z-index: 20; pointer-events: none;
+  animation: sparkle 1s ease-out forwards;
+}
+@keyframes sparkle {
+  0%   { transform: translate(0, 0) scale(0); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(120deg); opacity: 0; }
+}
+
+/* ============ 10. FINAL PAGE: HEARTBEAT + SIGNATURE ============ */
+.big-love {
+  font-family: var(--script); font-weight: 700;
+  font-size: clamp(2.4rem, 9vw, 4.5rem);
+  color: #a366a8; line-height: 1.2; margin-top: 18px;
+  animation: heartbeat 1.4s ease-in-out infinite;
+}
+@keyframes heartbeat {
+  0%, 40%, 100% { transform: scale(1); }
+  15% { transform: scale(1.09); }
+  30% { transform: scale(1.02); }
+}
+.signature { font-family: var(--script); font-size: 2rem; margin-top: 14px; color: var(--ink); }
+
+/* ============ 11. ACCESSIBILITY ============ */
+@media (prefers-reduced-motion: reduce) {
+  .card, .big-love { animation: none; }
+  .heart, .sparkle { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Floating hearts container -->
+<div id="hearts" aria-hidden="true"></div>
+
+<!-- ============ PAGE 1: Welcome ============ -->
+<section class="page active" id="page1">
+  <h1>Hey Babe! 💜</h1>
+  <div class="btn-row">
+    <button class="primary" onclick="goTo(2)">✨ Wanna know what's waiting for you?</button>
+    <button onclick="toggleModal(true)">🙈 No!</button>
+  </div>
+</section>
+
+<!-- "No!" popup (stays on Page 1) -->
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="card">
+    <h2 id="modalTitle">Why no? 😢</h2>
+    <p>Please click the other button 🥺💜</p>
+    <br>
+    <button class="primary" onclick="toggleModal(false)">Okay 💜</button>
+  </div>
+</div>
+
+<!-- ============ PAGE 2: Happy Boyfriend's Day ============ -->
+<section class="page" id="page2">
+  <h1>Happy Boyfriend's Day ❤️</h1>
+  <div class="card">
+    <p>You are the best boyfriend one could ever have and guess who is lucky??? It's meeee 😘</p>
+    <p>Loving you will always be my favourite thing to do and I would never stop doing it.</p>
+    <p>Well now I don't remember how to survive without being loved by you.</p>
+    <p>Every day I wake up saying your name, rejoice every moment thinking my man loves me and while being sad too I say your name because you aren't beside me to console me.</p>
+    <p>And every day I go to sleep knowing my man is the best in the whole world.</p>
+    <p>I Love you so much thangapulla &lt;3</p>
+  </div>
+  <button class="primary" onclick="goTo(3)">Next ➜</button>
+</section>
+
+<!-- ============ PAGE 3: Poem ============ -->
+<section class="page" id="page3">
+  <div class="card poem">
+    <p>Solla mudiyadha kaadhalum...<br>
+       sollil adangaadha nesamum...<br>
+       enna mudiyaadha aasayum...<br>
+       unnidathil thondrudhey &lt;3</p>
+  </div>
+  <button class="primary" onclick="goTo(4)">Next ➜</button>
+</section>
+
+<!-- ============ PAGE 4: Apology ============ -->
+<section class="page" id="page4">
+  <h1>Bomma asks for your forgiveness 😔</h1>
+  <div class="card">
+    <p>I know I was not available all time for the past few days and I'm really sorry for that mama.</p>
+    <p>I know how lonely you would have felt and I am completely responsible for making you feel that way.</p>
+    <p>I know I was not physically present but you were always present in my thoughts, be it while I was doing my research, reading papers, making flow diagrams, preparing for the presentation, shouting at my teammates for not being responsible for their work and everything, you were in my thoughts every single second and I really wish that I could tell how much I love you every single nanosecond.</p>
+    <p>I know I couldn't spare time and it was solely my mistake which I should have never ever committed in my life.</p>
+    <p><strong>SORRY 😞</strong></p>
+  </div>
+  <button class="primary" onclick="goTo(5)">Next ➜</button>
+</section>
+
+<!-- ============ PAGE 5: Forgive me ============ -->
+<section class="page" id="page5">
+  <div class="card poem">
+    <p>Anaivarum urangidum iravenum neram...<br>
+       enakadhu thalaianai nanaithidum neram...</p>
+    <p>oru naal sirithen...<br>
+       marunaal veruthen...</p>
+    <p>unai naan kollamal kondru pudhaitheney...</p>
+    <p><strong>mannipaaya?? 💔</strong></p>
+  </div>
+  <button class="primary" onclick="goTo(6)">Next ➜</button>
+</section>
+
+<!-- ============ PAGE 6: Finale ============ -->
+<section class="page" id="page6">
+  <h2>Mama, all I wanna say to you is...</h2>
+  <div class="card poem">
+    <p>Un arugil vaazhvadhondru podhum indha manniley...<br>
+       Veru ondrum thevai illai yaavum undhan anbiley...</p>
+    <p>Enai aalavey vandha magaraasaney...<br>
+       Naan unakaagavey pala piravigal thunai varuveney...</p>
+  </div>
+  <div class="big-love">I Love You So Much My Mama ❤️</div>
+  <div class="signature">Forever Yours 💜</div>
+</section>
+
+<script>
+/* ============ A. FLOATING HEARTS ============ */
+const heartsBox = document.getElementById('hearts');
+const symbols = ['♥', '💜', '♡', '💕'];
+
+function spawnHeart() {
+  const h = document.createElement('span');
+  h.className = 'heart';
+  h.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+  h.style.left = Math.random() * 100 + 'vw';
+  h.style.fontSize = 14 + Math.random() * 26 + 'px';
+  h.style.setProperty('--drift', (Math.random() * 120 - 60) + 'px');
+  h.style.animationDuration = 8 + Math.random() * 8 + 's';
+  heartsBox.appendChild(h);
+  setTimeout(() => h.remove(), 17000);
+}
+setInterval(spawnHeart, 700);
+for (let i = 0; i < 8; i++) setTimeout(spawnHeart, i * 250); // initial batch
+
+/* ============ B. SPARKLE BURST ============ */
+function sparkleBurst() {
+  const cx = innerWidth / 2, cy = innerHeight / 2;
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span');
+    s.className = 'sparkle';
+    s.textContent = ['✨', '💜', '⭐', '✦'][i % 4];
+    s.style.left = cx + 'px';
+    s.style.top = cy + 'px';
+    s.style.fontSize = 14 + Math.random() * 14 + 'px';
+    const angle = Math.random() * Math.PI * 2, dist = 90 + Math.random() * 190;
+    s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 1000);
+  }
+}
+
+/* ============ C. PAGE NAVIGATION (fade out, then fade in) ============ */
+let current = 1, busy = false;
+
+function goTo(n) {
+  if (busy || n === current) return;
+  busy = true;
+  sparkleBurst();
+  document.getElementById('page' + current).classList.remove('active');
+  setTimeout(() => {
+    const next = document.getElementById('page' + n);
+    next.scrollTop = 0;
+    next.classList.add('active');
+    current = n;
+    busy = false;
+  }, 450);
+}
+
+/* ============ D. "NO!" POPUP ============ */
+function toggleModal(show) {
+  document.getElementById('modal').classList.toggle('show', show);
+}
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target.id === 'modal') toggleModal(false);   // click outside to close
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleModal(false); });
+</script>
+</body>
+</html>
